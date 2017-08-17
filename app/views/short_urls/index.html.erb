@@ -1,0 +1,10 @@
+<div id="form">
+  <%= form_for ShortUrl.new, remote: true do |f| %>
+    <%= f.text_field :original_url, placeholder: "Your URL here" %>
+    <%= f.submit "Shorten" %>
+  <% end %>
+</div>
+
+<div id="result">
+  
+</div>
