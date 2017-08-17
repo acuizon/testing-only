@@ -12,7 +12,7 @@ class Api::V1::ShortUrlsController < ApplicationController
   end
 
   def show
-    url = ShortUrl.find_by(slug: params[:id])
+    url = ShortUrl.find_by(url: params[:id])
 
     if url.present?
       render json: url, status: 200

@@ -21,7 +21,7 @@
             url: "/api/v1/short_urls",
             data: { url: urlFieldValue },
             success: function(data) {
-              $("div#result").html("Your shortened url is: localhost:3000/" + data.slug);
+              $("div#result").html("Your shortened url is: localhost:3000/" + data.url);
             },
             error: function(xhr) {
               errorMsg = "";

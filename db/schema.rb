@@ -10,13 +10,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170817075722) do
+ActiveRecord::Schema.define(version: 20170817180744) do
 
   create_table "short_urls", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.string "slug"
+    t.string "url"
     t.text "original_url"
     t.datetime "created_at"
-    t.index ["slug"], name: "index_short_urls_on_slug", unique: true
+    t.index ["url"], name: "index_short_urls_on_url", unique: true
   end
 
 end

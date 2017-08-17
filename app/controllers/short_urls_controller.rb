@@ -4,7 +4,7 @@ class ShortUrlsController < ApplicationController
   end
 
   def show
-    @url = ShortUrl.find_by(slug: params[:id].to_s)
+    @url = ShortUrl.find_by(url: params[:id].to_s)
   end
 
 end
