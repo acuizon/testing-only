@@ -1,10 +1,41 @@
 <div id="form">
-  <%= form_for ShortUrl.new, remote: true do |f| %>
-    <%= f.text_field :original_url, placeholder: "Your URL here" %>
-    <%= f.submit "Shorten" %>
-  <% end %>
+  <%= text_field_tag :url, "", placeholder: "Your URL here" %>
+  <%= button_tag "Shorten", id: "shorten-btn" %>
 </div>
 
+<br>
+
 <div id="result">
-  
+
 </div>
+
+<% content_for :scripts do %>
+  <script>
+    $(document).ready(function() {
+      $("button#shorten-btn").on("click", function(e) {
+        urlFieldValue = $("input#url").val()
+
+        if(urlFieldValue.length != 0) {
+          $.ajax({
+            type: "POST",
+            url: "/api/v1/short_urls",
+            data: { url: urlFieldValue },
+            success: function(data) {
+              $("div#result").html("Your shortened url is: localhost:3000/" + data.slug);
+            },
+            error: function(xhr) {
+              errorMsg = "";
+              console.log(xhr)
+              
+              $.each($.parseJSON(xhr.responseText).errors, function(index, value) {
+                errorMsg = errorMsg + value + "<br>";
+              });
+
+              $("div#result").html(errorMsg);
+            }
+          })
+        }
+      });
+    });
+  </script>
+<% end %>

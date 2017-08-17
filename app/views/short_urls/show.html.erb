@@ -1,0 +1,16 @@
+<% if @url.present? %>
+
+  One moment please..
+
+  <% content_for :scripts do %>
+    <script>
+      $(document).ready(function() {
+        setTimeout(function() {
+          window.location = "<%= @url.original_url %>";
+        }, 3000);
+      });
+    </script>
+  <% end %>
+<% else %>
+  Your shortened url doesn't exist. It has probably expired if you shortened before or it hasn't been shortened at all.
+<% end %>

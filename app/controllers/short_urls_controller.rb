@@ -3,16 +3,8 @@ class ShortUrlsController < ApplicationController
   def index
   end
 
-  def create
-    respond_to do |format|
-      format.js
-    end
-  end
-
-  private
-
-  def allowed_params
-    params.require(:short_url).permit(:original_url)
+  def show
+    @url = ShortUrl.find_by(slug: params[:id].to_s)
   end
 
 end
