@@ -5,6 +5,10 @@ class ShortUrlsController < ApplicationController
 
   def show
     @url = ShortUrl.find_by(url: params[:id].to_s)
+
+    if @url.present?
+      @url.update_stats(request)
+    end
   end
 
 end

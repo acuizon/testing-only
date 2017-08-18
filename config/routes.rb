@@ -13,7 +13,11 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
-      resources :short_urls, only: [:create, :show]
+      resources :short_urls, only: [:create, :show] do
+        member do
+          get '/stats', to: "short_urls#stats"
+        end
+      end
     end
   end
 

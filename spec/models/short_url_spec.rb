@@ -6,6 +6,7 @@ RSpec.describe ShortUrl, type: :model do
     expect(create(:short_url)).to be_valid
 
     blank_url = build(:short_url, original_url: "")
+
     expect(blank_url.save).to be false
   end
 
@@ -29,6 +30,7 @@ RSpec.describe ShortUrl, type: :model do
 
   it "sets short_url after create" do
     url = create(:short_url)
+
     expect(url.url).not_to be_empty
     expect(url.url).not_to be_nil
   end
