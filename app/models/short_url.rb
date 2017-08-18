@@ -9,7 +9,7 @@ class ShortUrl < ApplicationRecord
   private
 
   def check_protocol
-    if !self.original_url[/\A(http|https):\/\//i]
+    if self.original_url.present? && !self.original_url.strip[/\A(http|https):\/\//i]
       self.original_url = "http://#{self.original_url}"
     end
   end
