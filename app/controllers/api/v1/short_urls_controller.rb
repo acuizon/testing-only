@@ -5,7 +5,7 @@ class Api::V1::ShortUrlsController < ApplicationController
     url = ShortUrl.new(original_url: params[:url])
     
     if url.save
-      render json: url, status: 200
+      render json: url, status: 201
     else
       render json: { errors: url.errors.full_messages }, status: 422
     end

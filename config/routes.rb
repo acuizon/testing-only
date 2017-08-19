@@ -4,7 +4,7 @@ Rails.application.routes.draw do
   root to: "short_urls#index"
 
   resources :short_urls, only: [] do
-    member do 
+    collection do 
       get '/stats', to: "short_urls#stats"
     end
   end

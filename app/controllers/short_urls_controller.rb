@@ -8,7 +8,15 @@ class ShortUrlsController < ApplicationController
 
     if @url.present?
       @url.update_stats(request)
+
+      redirect_to @url.original_url
+    else
+      render :show
     end
+  end
+
+  def stats
+
   end
 
 end
