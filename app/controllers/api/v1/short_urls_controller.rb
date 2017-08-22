@@ -25,7 +25,9 @@ class Api::V1::ShortUrlsController < ApplicationController
     url = ShortUrl.find_by(url: params[:id])
 
     if url.present?
-      render json: url.stats, status: 200
+      res = url.stats(params[:start_range].presence, params[:end_range].presence)
+
+      render json: res, status: res.keys.include?(:errors) ? 404 : 200
     else
       render json: { errors: "ShortUrl not found." }, status: 404
     end

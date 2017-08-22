@@ -1,7 +1,7 @@
 class ShortUrl < ApplicationRecord
 
   has_many :daily_views, dependent: :destroy
-  has_many :visitors, through: :daily_views
+  has_many :visitors, through: :daily_views, dependent: :destroy
 
   validates :original_url, presence: true
   validates :original_url, format: { with: /\A(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?\z/ix }
@@ -22,8 +22,38 @@ class ShortUrl < ApplicationRecord
     end
   end
 
-  def return_stats(opts = {})
-    
+  def stats(start_range = nil, end_range = nil)
+    if !start_range.present? && !end_range.present?
+      start_range = Date.current
+      end_range = Date.current
+    elsif start_range.present? && !end_range.present?
+      end_range = start_range
+    elsif !start_range.present? && end_range.present?
+      start_range = end_range
+    end
+
+    begin
+      start_range.to_date
+      end_range.to_date
+    rescue ArgumentError
+      return { errors: "Invalid date/s." }
+    end
+
+    daily_view = {}
+    daily_view_arr = []
+
+    self.daily_views.where("view_date >= ? AND view_date <= ?", start_range, end_range).each do |view|
+      ip_addresses = view.visitors.map(&:ip_address)
+      daily_view_arr << view.view_date.to_s
+
+      if daily_view[view.view_date.to_s].present?
+        daily_view[view.view_date.to_s] << { hour: view.view_hour, ip_addresses: ip_addresses, ip_count: ip_addresses.count }
+      else
+        daily_view[view.view_date.to_s] = [{ hour: view.view_hour, ip_addresses: ip_addresses, ip_count: ip_addresses.count }]
+      end
+    end
+
+    return { daily_views_arr: daily_view_arr.uniq, daily_views: daily_view }
   end
 
   private

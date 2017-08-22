@@ -1,1 +1,96 @@
 Inquire stats for your Short Url
+
+<div>
+  <%= text_field_tag :short_url, "", placeholder: "Shortened URL here" %>
+  <br>Start:
+  <%= date_field_tag :start_range, "" %>
+  <br>End:
+  <%= date_field_tag :end_range, "" %>
+  <%= button_tag "Inquire", id: "inquire-btn" %>
+</div>
+
+<div id="result">
+
+</div>
+
+<%= content_for :scripts do %>
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <script>
+    $(document).ready(function () {
+      $("button#inquire-btn").on("click", function(e) {
+        shortUrlValue = $("input#short_url").val();
+        startRange = $("input#start_range").val();
+        endRange = $("input#end_range").val();
+
+        if(shortUrlValue.length != 0) {
+          $.ajax({
+            type: "GET",
+            url: "/api/v1/short_urls/" + shortUrlValue + "/stats",
+            data: { start_range: startRange, end_range: endRange },
+            dataType: 'json',
+            success: function(data) {
+              var seriesArr = new Array();
+              $.each(data.daily_views_arr, function(index, value) {
+                
+                tempValues = new Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0)
+                $.each(data.daily_views[value], function(i, v) {
+                  tempValues[v.hour] = v.ip_count;
+                })
+                
+                seriesArr.push({ name: value, data: tempValues })
+              })
+
+              Highcharts.chart('result', {
+                chart: {
+                    type: 'column'
+                },
+                title: {
+                    text: 'Unique Visitors'
+                },
+                xAxis: {
+                    categories: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
+                    crosshair: true,
+                    title: {
+                      text: "Hour of Day"
+                    }
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: 'Visits'
+                    },
+                    tickInterval: 1
+                },
+                tooltip: {
+                    headerFormat: '<span style="font-size:10px">Hour: {point.key}</span><table>',
+                    pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                        '<td style="padding:0"><b>{point.y} visits</b></td></tr>',
+                    footerFormat: '</table>',
+                    shared: true,
+                    useHTML: true
+                },
+                plotOptions: {
+                    column: {
+                        pointPadding: 0.2,
+                        borderWidth: 0
+                    }
+                },
+                series: seriesArr
+              });
+            },
+            error: function(xhr) {
+              errorMsg = "";
+              console.log(xhr)
+              
+              $.each($.parseJSON(xhr.responseText).errors, function(index, value) {
+                errorMsg = errorMsg + value + "<br>";
+              });
+
+              $("div#result").html(errorMsg);
+            }
+          });
+        }
+      });
+    });
+  </script>
+<% end %>
