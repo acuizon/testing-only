@@ -1,6 +1,7 @@
 class ShortUrl < ApplicationRecord
 
-  serialize :stats, Hash
+  has_many :daily_views, dependent: :destroy
+  has_many :visitors, through: :daily_views
 
   validates :original_url, presence: true
   validates :original_url, format: { with: /\A(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?\z/ix }
@@ -10,20 +11,19 @@ class ShortUrl < ApplicationRecord
 
   def update_stats(req)
     remote_ip = req.remote_ip
-    date_of_visit = Time.current.strftime("%Y-%m-%d")
-    hour_of_visit = Time.current.hour.to_s
+    current_time = Time.current
+    date_of_visit = current_time.to_date
+    hour_of_visit = current_time.hour
 
-    if self.stats[remote_ip].present?
-      if self.stats[remote_ip].keys.include?(date_of_visit)
-        self.stats[remote_ip][date_of_visit][hour_of_visit].present? ? self.stats[remote_ip][date_of_visit][hour_of_visit] += 1 : self.stats[remote_ip][date_of_visit][hour_of_visit] = 1
-      else
-        self.stats[remote_ip].merge!({ date_of_visit => { hour_of_visit => 1 } })
-      end
-    else
-      self.stats.merge!({ remote_ip => { date_of_visit => { hour_of_visit => 1 } } })
+    daily_view = self.daily_views.where(view_date: date_of_visit, view_hour: hour_of_visit).first.presence || self.daily_views.create(view_date: date_of_visit, view_hour: hour_of_visit)
+
+    unless daily_view.visitors.where(ip_address: remote_ip).first.present?
+      daily_view.visitors.create(ip_address: remote_ip)
     end
+  end
 
-    self.save
+  def return_stats(opts = {})
+    
   end
 
   private

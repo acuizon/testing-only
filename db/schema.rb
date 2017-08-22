@@ -10,14 +10,30 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170818141001) do
+ActiveRecord::Schema.define(version: 20170822124631) do
+
+  create_table "daily_views", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.date "view_date"
+    t.integer "view_hour"
+    t.bigint "short_url_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["short_url_id"], name: "index_daily_views_on_short_url_id"
+  end
 
   create_table "short_urls", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "url"
     t.text "original_url"
     t.datetime "created_at"
-    t.text "stats"
     t.index ["url"], name: "index_short_urls_on_url", unique: true
+  end
+
+  create_table "visitors", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "ip_address"
+    t.bigint "daily_view_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["daily_view_id"], name: "index_visitors_on_daily_view_id"
   end
 
 end
